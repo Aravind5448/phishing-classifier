@@ -44,3 +44,17 @@ To run this project on your local machine, you will need to run the backend and 
 git clone [https://github.com/aravind5448/phishing-classifier.git](https://github.com/aravind5448/phishing-classifier.git)
 cd phishing-classifier
 pip install -r requirements.txt
+
+**2. Start the FastAPI Backend (Terminal 1):**
+
+```bash
+uvicorn api:app --reload
+The API will be available at http://localhost:8000
+```
+
+**3. Start the Streamlit Frontend (Terminal 2):**
+
+```bash
+# Open app.py and ensure API_URL is set to "http://localhost:8000/predict" before running
+streamlit run app.py
+The UI will be available at http://localhost:8501
