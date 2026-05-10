@@ -14,6 +14,12 @@ class URLFeatures(BaseModel):
     Entropy: float = Field(..., ge=0.0)
     Has_IP: int = Field(..., ge=0, le=1)
     Punycode: int = Field(..., ge=0, le=1)
+    
+    # New Features Validation
+    Suspicious_Keywords: int = Field(..., ge=0)
+    VC_Ratio: float = Field(..., ge=0.0)
+    Longest_Consonant_Seq: int = Field(..., ge=0)
+    Special_Char_Ratio: float = Field(..., ge=0.0)
 
 class InferenceResponse(BaseModel):
     prediction: int
