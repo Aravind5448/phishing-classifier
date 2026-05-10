@@ -30,7 +30,7 @@ if st.button("Initiate Scan", type="primary"):
 
                 st.divider()
                 
-                if prediction == 1: 
+                if prediction == 0: 
                     st.error(f"## 🚨 HIGH RISK: Phishing Detected")
                     st.metric("Threat Confidence", f"{confidence:.2f}%")
                 else:
