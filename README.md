@@ -1,28 +1,46 @@
-# 🛡️ Zero-Day Phishing URL Classifier
+# Phishing URL Classifier
 
-> An end-to-end Machine Learning pipeline that detects malicious URLs in real-time using structural mathematics and gradient boosted inference.
+**Live Demo:** [phishing-classifier-project.streamlit.app](https://phishing-classifier-project.streamlit.app/)  
+**Dataset:** [UCI PhiUSIIL Phishing URL Dataset](https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset)
 
-## 📌 Architecture Overview
-Traditional phishing detectors rely on static blacklists, making them vulnerable to "Zero-Day" attacks (newly registered malicious domains). This project solves that by analyzing the mathematical and lexical structure of the URL itself—no page visit or blacklist lookup required.
+A machine learning pipeline that classifies URLs as legitimate or phishing based on 13 extracted lexical and structural features. The project utilizes a decoupled architecture, separating a Streamlit frontend client from a FastAPI inference backend.
 
-### **Core Engineering Features:**
-* **Information Theory (Shannon Entropy):** Implements $H(X) = -\sum P(x_i) \log_2 P(x_i)$ to measure string randomness, successfully identifying bot-generated Domain Generation Algorithms (DGAs).
-* **Homograph Detection:** Parses URLs for Punycode (`xn--`) to detect advanced brand-impersonation attacks.
-* **Gradient Boosted Inference:** Utilizes an **XGBoost** classifier (trained with GPU acceleration) to handle non-linear feature interactions, achieving **99.27% validation accuracy** on the PhiUSIIL dataset.
-* **Asynchronous Web UI:** Deployed via Streamlit with a custom caching layer that strips CUDA hardware bindings to ensure thread-safe, CPU-based web inference.
+## 🏗️ Architecture & Tech Stack
 
-## 🚀 Technical Stack
-* **Language:** Python 3.12
-* **Machine Learning:** Scikit-Learn, XGBoost
-* **Feature Engineering:** tldextract, urllib, math (Entropy)
-* **Frontend:** Streamlit
-* **Data Persistence:** Joblib
+* **Backend (Inference API):** FastAPI
+* **Frontend (Client UI):** Streamlit
+* **Machine Learning:** XGBoost, Scikit-Learn
+* **Data Processing:** Pandas, Joblib (Multiprocessing)
+* **Validation & Security:** Pydantic (Data schema enforcement), SlowAPI (Rate limiting)
+* **Deployment & CI/CD:** Docker, Render (Backend), Streamlit Cloud (Frontend), GitHub Actions
 
-## 🧠 Model Performance
-The model was trained on a downsampled, stratified subset of the UCI PhiUSIIL dataset to ensure balanced class representation.
-* **Accuracy:** 99.27%
-* **Precision/Recall (Phishing):** 0.99 / 0.99
-* **Precision/Recall (Legitimate):** 0.99 / 1.00
+## 🔍 Feature Engineering
 
----
-*Developed by Aravind D.*
+The model does not rely on page content or external database lookups. It evaluates the URL string itself using 13 engineered features designed to identify common obfuscation and Domain Generation Algorithm (DGA) patterns. 
+
+| Feature Category | Features Extracted | Rationale |
+| :--- | :--- | :--- |
+| **Base Metrics** | URL Length, Domain Length, Subdomain Count | Phishing links often use excessively long URLs or subdomains to hide the root domain. |
+| **Punctuation** | Dot Count, Hyphen Count, Special Character Ratio | Attackers frequently use hyphens or special characters to mimic legitimate brands (e.g., `secure-login-apple`). |
+| **Structural** | Has IP Address, Is HTTPS | Using an IP instead of a domain name is a strong indicator of malicious intent. |
+| **Obfuscation** | Punycode (`xn--`), Shannon Entropy | Detects homograph attacks and measures string randomness to identify algorithmically generated domains. |
+| **Linguistic** | Suspicious Keywords, Vowel/Consonant Ratio, Longest Consonant Sequence | Flags common social engineering terms (`login`, `verify`) and detects unnatural character groupings. |
+
+## 📊 Model Performance
+
+The XGBoost classifier was trained on 235,795 rows of the PhiUSIIL dataset. To handle the high volume of string operations during feature extraction, the preprocessing pipeline utilizes CPU multiprocessing via `joblib.Parallel`.
+
+* **Validation Accuracy:** 99.64%
+* **F1-Score:** 1.00
+
+*Note: While the model achieves >99% accuracy on the PhiUSIIL dataset, this specific dataset contains overlapping domain structures. In a live production environment facing novel threats, real-world accuracy is expected to be lower due to adversarial drift.*
+
+## 🚀 Local Setup & Installation
+
+To run this project on your local machine, you will need to run the backend and frontend simultaneously in two separate terminal windows.
+
+**1. Clone the repository and install dependencies:**
+```bash
+git clone [https://github.com/aravind5448/phishing-classifier.git](https://github.com/aravind5448/phishing-classifier.git)
+cd phishing-classifier
+pip install -r requirements.txt
