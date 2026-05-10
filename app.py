@@ -4,7 +4,7 @@ import requests
 st.set_page_config(page_title="Phishing Classifier", page_icon="🛡️", layout="centered")
 
 # Note: We will change this to your live Render URL in the next step
-API_URL = "http://localhost:8000/predict"
+API_URL = "https://phishing-classifier-api.onrender.com/predict"
 
 st.title("🛡️ Zero-Day Phishing URL Classifier")
 st.markdown("""
