@@ -50,12 +50,15 @@ pip install -r requirements.txt
 
 ```bash
 uvicorn api:app --reload
-The API will be available at http://localhost:8000
 ```
+The API will be available at http://localhost:8000
 
 **3. Start the Streamlit Frontend (Terminal 2):**
 
 ```bash
 # Open app.py and ensure API_URL is set to "http://localhost:8000/predict" before running
 streamlit run app.py
+```
 The UI will be available at http://localhost:8501
+
+Developed by Aravind D.
