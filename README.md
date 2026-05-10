@@ -44,6 +44,7 @@ To run this project on your local machine, you will need to run the backend and 
 git clone [https://github.com/aravind5448/phishing-classifier.git](https://github.com/aravind5448/phishing-classifier.git)
 cd phishing-classifier
 pip install -r requirements.txt
+```
 
 **2. Start the FastAPI Backend (Terminal 1):**
 
