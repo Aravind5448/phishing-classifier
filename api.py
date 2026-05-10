@@ -1,14 +1,20 @@
-import joblib
-import pandas as pd
-from fastapi import FastAPI, HTTPException
-from src.feature_extractor import extract_features
-from src.schemas import URLInferenceRequest, URLFeatures, InferenceResponse
+from fastapi import FastAPI, HTTPException, Request
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
-app = FastAPI(
-    title="Zero-Day Phishing Inference API",
-    description="MLOps-ready backend for lexical URL analysis",
-    version="1.0.0"
-)
+# Initialize the rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
+app = FastAPI(title="Zero-Day Phishing Inference API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Protect the endpoint
+@app.post("/predict")
+@limiter.limit("5/minute")
+async def predict_url(request: Request, payload: URLInferenceRequest):
+    # ... existing inference logic ...
 
 # Load artifacts on startup
 try:
