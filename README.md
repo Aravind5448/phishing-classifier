@@ -61,4 +61,13 @@ streamlit run app.py
 ```
 The UI will be available at http://localhost:8501
 
+## 🔮 System Limitations & Future Work
+
+While this MLOps pipeline demonstrates a robust, zero-visit lexical extraction architecture, real-world enterprise phishing detection requires a hybrid approach to mitigate concept drift and adversarial evasion. If scaling this project to production, the following architectures would be integrated:
+
+1.  **Network Intelligence Integration:** Lexical-only models are vulnerable to string obfuscation. Integrating real-time `WHOIS` queries (Domain Age) and checking `DNS/ASN` reputations would provide ground-truth metadata to catch Zero-Day domains that mimic safe lexical structures.
+2.  **SSL Certificate Transparency:** Analyzing the "Issued To" and "Valid From" fields of TLS certificates to differentiate between long-standing EV certificates and 1-hour-old Let's Encrypt certificates.
+3.  **Deep Learning for Obfuscation:** Replacing basic NLP keyword matching with Character-Level Embeddings and 1D-CNNs to catch deliberate misspellings (e.g., `L0gin`, `secvre`).
+4.  **Feedback Loops:** Implementing a `/report` endpoint to capture False Positives (like the initial GitHub hallucination), enabling continuous automated retraining pipelines to combat adversarial drift.
+
 Developed by Aravind D.

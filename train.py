@@ -4,9 +4,11 @@ import logging
 import joblib
 import pandas as pd
 from xgboost import XGBClassifier
+from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 from joblib import Parallel, delayed
+
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from src.feature_extractor import extract_features
@@ -48,6 +50,11 @@ def build_and_train_pipeline():
     logger.info("Partitioning tensors (80/20 split)...")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
+    logger.info("Applying RobustScaler to normalize feature distributions...")
+    scaler = RobustScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
     logger.info("Transferring workload to RTX GPU for Gradient Boosting...")
     model = XGBClassifier(
         n_estimators=300,        # Increased trees for complex feature interactions
@@ -60,10 +67,10 @@ def build_and_train_pipeline():
         n_jobs=-1
     )
 
-    model.fit(X_train, y_train)
+    model.fit(X_train_scaled, y_train)
 
     logger.info("Executing validation inferences...")
-    predictions = model.predict(X_test)
+    predictions = model.predict(X_test_scaled)
     acc = accuracy_score(y_test, predictions)
     
     logger.info(f"Validation Accuracy on {len(X_test)} validation samples: {acc * 100:.2f}%")
@@ -73,6 +80,7 @@ def build_and_train_pipeline():
     logger.info("Serializing updated 13-feature model artifacts...")
     joblib.dump(model, os.path.join(MODEL_DIR, 'phishing_model.pkl'))
     joblib.dump(list(X.columns), os.path.join(MODEL_DIR, 'feature_names.pkl'))
+    joblib.dump(scaler, os.path.join(MODEL_DIR, 'robust_scaler.pkl'))
     
     logger.info("Enterprise Pipeline execution completed.")
 
